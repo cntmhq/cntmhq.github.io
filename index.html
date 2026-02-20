@@ -1,66 +1,900 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
+
+<!DOCTYPE html>
+<!--
+    THIS IS A TEMPLATE THAT SHOULD BE USED EVERY TIME AND MODIFIED.
+    WHAT TO KEEP:
+    ✓ Overall structure (header, sidebar, main content)
+    ✓ Branding (colors, fonts, layout)
+    ✓ Seed navigation section (always include this)
+
+    WHAT TO CREATIVELY EDIT:
+    ✗ The parameters (define what YOUR art needs)
+    ✗ The UI controls (match YOUR parameters)
+
+    Let your philosophy guide the implementation.
+    The world is your oyster - be creative!
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Reactome 3D Visualization - Interactive WebGL scene with Three.js">
     <title>connectome</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-    <!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-  </head>
-  <body>
-    <!-- Brand  -->
-      <img class="logo" src="assets/img/connectome_logo_shadow_reactome.svg" style="margin: 3px -4px;" />
-      <img class="logo" src="assets/img/connectome_logo_green_reactome.svg" />
-    
-    <!-- space-around -->
-      <div class="space"></div>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="backgroung-color:black!important">
+    <!-- Brand  (ALWAYS KEEP THIS) -->
+    <!-- <img class="logo" src="connectome_logo_shadow_reactome.svg" style="margin: 3px -4px;" /> -->
+    <!-- <img class="logo" src="connectome_logo_green_reactome.svg" /> -->
 
-    <!-- Header -->
-      <header id="header">
+    <!-- space-around (ALWAYS KEEP THIS) -->
+    <div class="space"></div>
+
+    <!-- Connectome Top Navigation (FIXED CENTERED) -->
+    <nav id="connectome-nav" class="connectome-nav">
+        <div class="nav-container">
+            <a href="#" id="nav-reveal" class="nav-link active">!#/usr/bin/env cntm</a>
+            <a href="#" id="nav-sre" class="nav-link">~/.sre</a>
+            <a href="#" id="nav-sec" class="nav-link">~/.sec</a>
+            <a href="#" id="nav-dev" class="nav-link">~/.dev</a>
+            <a href="#" id="nav-ops" class="nav-link">~/.ops</a>
+        </div>
+    </nav>
+
+    <!-- Header (ALWAYS KEEP THIS) -->
+    <header id="header">
         <h1><span class="word">connectome</span></h1>
-        <p>Secure SaaS - private and encrypted hybrid solutions <br>in cloud native technologies and distributed systems</p>
-      </header>
+        <p><strong>Agent Friendly Automation</strong> </br> FOSS Cloud Native Workflows</p>
+    </header>
 
-    <!-- Footer -->
-      <footer id="footer">
 
+    <!-- Panel Toggle Button (always visible) -->
+    <button id="panel-toggle-btn" aria-label="Toggle controls" style="display: none; opacity: 0; pointer-events: none;">
+        <span class="toggle-icon">☰</span>
+    </button>
+
+    <!-- GCP Status Indicator -->
+    <div id="gcp-status-indicator" title="Google Cloud Platform status" style="display: none; opacity: 0; pointer-events: none;">
+        GCP: Loading...
+    </div>
+
+    <!-- Control Panel Overlay -->
+    <div id="control-panel" class="collapsed">
+        <div class="panel-header">
+            <h2>Controls</h2>
+        </div>
+
+        <!-- Headers (CUSTOMIZE THIS FOR YOUR ART) -->
+        <h4>Reactome Visualization</h4>
+        <div class="subtitle">with Connectome Logo</div>
+
+        <!-- Stage Transition Buttons -->
+        <div class="control-section">
+            <h3 class="section-title">Stages</h3>
+            <div class="stage-buttons">
+                <button id="stage-1-btn" class="stage-btn active">Initial</button>
+                <button id="stage-2-btn" class="stage-btn">Reveal</button>
+                <!-- <button id="stage-3-btn" class="stage-btn">Focus</button> -->
+            </div>
+            <!-- <div class="stage-buttons">
+                <button id="stage-4-btn" class="stage-btn">Test</button>
+                <button id="stage-5-btn" class="stage-btn">Void</button>
+            </div> -->
+            <!-- <div class="stage-buttons">
+                <button id="stage-6-btn" class="stage-btn">SRE</button>
+                <button id="stage-7-btn" class="stage-btn">SEC</button>
+            </div>
+            <div class="stage-buttons">
+                <button id="stage-8-btn" class="stage-btn">DEV</button>
+                <button id="stage-9-btn" class="stage-btn">OPS</button>
+            </div> -->
+            <div class="stage-buttons">
+                <button id="auto-cycle-btn">Auto Cycle</button>
+                <button id="reset-stage-btn">Clear History</button>
+            </div>
+        </div>
+        
+        <!-- Scene Section (ALWAYS KEEP THIS) -->
+        <div class="control-section">
+            <h3 class="section-title">Scene</h3>
+
+            <!-- Camera Distance -->
+            <div class="control-group">
+                <label>
+                    Camera Distance
+                    <span id="distance-value">2.5</span>
+                </label>
+                <input type="range" id="camera-distance" min="0.5" max="21" step="0.1" value="2.5">
+            </div>
+
+            <!-- Rotation Speed -->
+            <div class="control-group">
+                <label>
+                    Rotation Speed
+                    <span id="speed-value">1.0x</span>
+                </label>
+                <input type="range" id="rotation-speed" min="0" max="5" step="0.1" value="1.0">
+            </div>
+
+            <!-- Object Count -->
+            <div class="control-group">
+                <label>
+                    Object Count
+                    <span id="count-value">70</span>
+                </label>
+                <input type="range" id="object-count" min="10" max="150" step="1" value="70">
+            </div>
+        </div>
+
+        <!-- Camera Z Motion Section -->
+        <div class="control-section">
+            <h3 class="section-title">Camera Z Motion</h3>
+
+            <!-- Z Motion Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="camera-z-motion-enabled" checked>
+                    <span>Enable Z Motion</span>
+                </div>
+            </div>
+
+            <!-- Z Motion Controls (collapsible) -->
+            <div id="camera-z-motion-controls">
+                <!-- Speed -->
+                <div class="control-group">
+                    <label>
+                        Speed
+                        <span id="camera-z-speed-value">1.0x</span>
+                    </label>
+                    <input type="range" id="camera-z-speed" min="0.1" max="3" step="0.1" value="1.0">
+                </div>
+
+                <!-- Amplitude -->
+                <div class="control-group">
+                    <label>
+                        Amplitude
+                        <span id="camera-z-amplitude-value">1.0</span>
+                    </label>
+                    <input type="range" id="camera-z-amplitude" min="0" max="2" step="0.1" value="1.0">
+                </div>
+
+                <!-- Primary Wave Frequency -->
+                <div class="subtitle" style="margin-top: 10px;">Wave Frequencies</div>
+                <div class="control-group">
+                    <label>
+                        Primary (sec)
+                        <span id="camera-z-primary-freq-value">1.7</span>
+                    </label>
+                    <input type="range" id="camera-z-primary-freq" min="0.5" max="5" step="0.1" value="1.7">
+                </div>
+
+                <!-- Secondary Wave Frequency -->
+                <div class="control-group">
+                    <label>
+                        Secondary (sec)
+                        <span id="camera-z-secondary-freq-value">3.2</span>
+                    </label>
+                    <input type="range" id="camera-z-secondary-freq" min="0.5" max="5" step="0.1" value="3.2">
+                </div>
+
+                <!-- Tertiary Wave Frequency -->
+                <div class="control-group">
+                    <label>
+                        Tertiary (sec)
+                        <span id="camera-z-tertiary-freq-value">1.1</span>
+                    </label>
+                    <input type="range" id="camera-z-tertiary-freq" min="0.5" max="5" step="0.1" value="1.1">
+                </div>
+            </div>
+        </div>
+
+        <!-- Appearance Section (ALWAYS KEEP THIS) -->
+        <div class="control-section">
+            <h3 class="section-title">Appearance</h3>
+
+            <!-- Opacity -->
+            <div class="control-group">
+                <label>
+                    Opacity
+                    <span id="opacity-value">0.20</span>
+                </label>
+                <input type="range" id="opacity" min="0.01" max="1" step="0.01" value="0.20">
+            </div>
+
+            <!-- Color -->
+            <div class="control-group">
+                <label>Color</label>
+                <input type="color" id="color" value="#1cb495">
+            </div>
+
+            <!-- Wireframe Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="wireframe">
+                    <span>Wireframe Mode</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shader Effects Section (ALWAYS KEEP THIS) -->
+        <div class="control-section">
+            <h3 class="section-title">Sci-Fi Shader</h3>
+
+            <!-- Shader Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="shader-enabled">
+                    <span>Enable Effects</span>
+                </div>
+            </div>
+
+            <!-- Shader Controls (hidden by default) -->
+            <div id="shader-controls" style="display: none;">
+                <!-- Bloom Strength -->
+                <div class="control-group">
+                    <label>
+                        Bloom
+                        <span id="bloom-value">0.8</span>
+                    </label>
+                    <input type="range" id="bloom-strength" min="0" max="3" step="0.1" value="0.8">
+                </div>
+
+                <!-- Scanlines -->
+                <div class="control-group">
+                    <label>
+                        Scanlines
+                        <span id="scanline-value">0.15</span>
+                    </label>
+                    <input type="range" id="scanline-intensity" min="0" max="0.5" step="0.01" value="0.15">
+                </div>
+
+                <!-- Noise/Grain -->
+                <div class="control-group">
+                    <label>
+                        Noise
+                        <span id="noise-value">0.05</span>
+                    </label>
+                    <input type="range" id="noise-intensity" min="0" max="0.2" step="0.01" value="0.05">
+                </div>
+
+                <!-- RGB Shift -->
+                <div class="control-group">
+                    <label>
+                        RGB Shift
+                        <span id="rgb-value">0.002</span>
+                    </label>
+                    <input type="range" id="rgb-shift" min="0" max="0.02" step="0.001" value="0.002">
+                </div>
+            </div>
+        </div>
+
+        <!-- Connectome Logo Section -->
+        <div class="control-section">
+            <h3 class="section-title">Connectome Logo</h3>
+
+            <!-- Connectome Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="connectome-enabled" checked>
+                    <span>Show Logo</span>
+                </div>
+            </div>
+
+            <!-- Connectome Controls -->
+            <div id="connectome-controls">
+                <!-- Scale -->
+                <div class="control-group">
+                    <label>
+                        Scale
+                        <span id="connectome-scale-value">8.0</span>
+                    </label>
+                    <input type="range" id="connectome-scale" min="1" max="40" step="0.5" value="8">
+                </div>
+
+                <!-- Position XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Position</div>
+                <div class="control-group">
+                    <label>
+                        X
+                        <span id="connectome-pos-x-value">0.00</span>
+                    </label>
+                    <input type="range" id="connectome-pos-x" min="-2" max="2" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Y
+                        <span id="connectome-pos-y-value">0.10</span>
+                    </label>
+                    <input type="range" id="connectome-pos-y" min="-2" max="4" step="0.05" value="0.1">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Z
+                        <span id="connectome-pos-z-value">0.00</span>
+                    </label>
+                    <input type="range" id="connectome-pos-z" min="-2" max="2" step="0.05" value="0">
+                </div>
+
+                <!-- Rotation XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Rotation</div>
+                <div class="control-group">
+                    <label>
+                        Rx
+                        <span id="connectome-rot-x-value">0°</span>
+                    </label>
+                    <input type="range" id="connectome-rot-x" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Ry
+                        <span id="connectome-rot-y-value">0°</span>
+                    </label>
+                    <input type="range" id="connectome-rot-y" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Rz
+                        <span id="connectome-rot-z-value">0°</span>
+                    </label>
+                    <input type="range" id="connectome-rot-z" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+
+                <!-- Color -->
+                <div class="subtitle" style="margin-top: 10px;">Material</div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <input type="color" id="connectome-color" value="#2ed4b0">
+                </div>
+
+                <!-- Material Properties -->
+                <div class="control-group">
+                    <label>
+                        Roughness
+                        <span id="connectome-roughness-value">0.40</span>
+                    </label>
+                    <input type="range" id="connectome-roughness" min="0" max="1" step="0.05" value="0.4">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Metalness
+                        <span id="connectome-metalness-value">0.10</span>
+                    </label>
+                    <input type="range" id="connectome-metalness" min="0" max="1" step="0.05" value="0.1">
+                </div>
+
+                <!-- Wireframe Toggle -->
+                <div class="control-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="connectome-wireframe" checked>
+                        <span>Wireframe</span>
+                    </div>
+                </div>
+
+                <!-- Light Controls -->
+                <div class="subtitle" style="margin-top: 10px;">Lighting</div>
+
+                <div class="control-group">
+                    <label>
+                        Ambient
+                        <span id="connectome-light-ambient-value">0.50</span>
+                    </label>
+                    <input type="range" id="connectome-light-ambient" min="0" max="2" step="0.05" value="0.5">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Main
+                        <span id="connectome-light-main-value">1.00</span>
+                    </label>
+                    <input type="range" id="connectome-light-main" min="0" max="3" step="0.1" value="1.0">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Back (Teal)
+                        <span id="connectome-light-back-value">0.40</span>
+                    </label>
+                    <input type="range" id="connectome-light-back" min="0" max="2" step="0.05" value="0.4">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Fill
+                        <span id="connectome-light-fill-value">0.30</span>
+                    </label>
+                    <input type="range" id="connectome-light-fill" min="0" max="2" step="0.05" value="0.3">
+                </div>
+            </div>
+        </div>
+
+        <!-- C Signet Section -->
+        <div class="control-section">
+            <h3 class="section-title">C Signet</h3>
+
+            <!-- C Signet Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="csignet-enabled">
+                    <span>Show Signet</span>
+                </div>
+            </div>
+
+            <!-- C Signet Controls (hidden by default) -->
+            <div id="csignet-controls" style="display: none;">
+                <!-- Scale -->
+                <div class="control-group">
+                    <label>
+                        Scale
+                        <span id="csignet-scale-value">20.0</span>
+                    </label>
+                    <input type="range" id="csignet-scale" min="5" max="50" step="1" value="20">
+                </div>
+
+                <!-- Position XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Position</div>
+                <div class="control-group">
+                    <label>
+                        X
+                        <span id="csignet-pos-x-value">0.00</span>
+                    </label>
+                    <input type="range" id="csignet-pos-x" min="-2" max="2" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Y
+                        <span id="csignet-pos-y-value">1.20</span>
+                    </label>
+                    <input type="range" id="csignet-pos-y" min="-1" max="5" step="0.1" value="1.2">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Z
+                        <span id="csignet-pos-z-value">0.00</span>
+                    </label>
+                    <input type="range" id="csignet-pos-z" min="-2" max="2" step="0.05" value="0">
+                </div>
+
+                <!-- Rotation XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Rotation</div>
+                <div class="control-group">
+                    <label>
+                        Rx
+                        <span id="csignet-rot-x-value">0°</span>
+                    </label>
+                    <input type="range" id="csignet-rot-x" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Ry
+                        <span id="csignet-rot-y-value">0°</span>
+                    </label>
+                    <input type="range" id="csignet-rot-y" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Rz
+                        <span id="csignet-rot-z-value">0°</span>
+                    </label>
+                    <input type="range" id="csignet-rot-z" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+
+                <!-- Color -->
+                <div class="control-group">
+                    <label>Color</label>
+                    <input type="color" id="csignet-color" value="#1cb495">
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="control-section">
+            <h3 class="section-title">Header</h3>
+
+            <!-- Header Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="header-enabled" checked>
+                    <span>Show Header</span>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div id="header-controls">
+                <!-- Scale -->
+                <div class="control-group">
+                    <label>
+                        Scale
+                        <span id="header-scale-value">1.00</span>
+                    </label>
+                    <input type="range" id="header-scale" min="0.1" max="5" step="0.05" value="1">
+                </div>
+
+                <!-- Opacity -->
+                <div class="control-group">
+                    <label>
+                        Opacity
+                        <span id="header-opacity-value">0.50</span>
+                    </label>
+                    <input type="range" id="header-opacity" min="0" max="1" step="0.05" value="0.5">
+                </div>
+
+                <!-- Position XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Position</div>
+                <div class="control-group">
+                    <label>
+                        X
+                        <span id="header-pos-x-value">0.00</span>
+                    </label>
+                    <input type="range" id="header-pos-x" min="-10" max="10" step="0.1" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Y
+                        <span id="header-pos-y-value">0.00</span>
+                    </label>
+                    <input type="range" id="header-pos-y" min="-10" max="10" step="0.1" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Z
+                        <span id="header-pos-z-value">-2.00</span>
+                    </label>
+                    <input type="range" id="header-pos-z" min="-10" max="10" step="0.1" value="-2">
+                </div>
+
+                <!-- Rotation XYZ -->
+                <div class="subtitle" style="margin-top: 10px;">Rotation</div>
+                <div class="control-group">
+                    <label>
+                        Rx
+                        <span id="header-rot-x-value">0°</span>
+                    </label>
+                    <input type="range" id="header-rot-x" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Ry
+                        <span id="header-rot-y-value">0°</span>
+                    </label>
+                    <input type="range" id="header-rot-y" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+                <div class="control-group">
+                    <label>
+                        Rz
+                        <span id="header-rot-z-value">0°</span>
+                    </label>
+                    <input type="range" id="header-rot-z" min="-3.14159" max="3.14159" step="0.05" value="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Glitch Effect Section -->
+        <div class="control-section">
+            <h3 class="section-title">Glitch Effect</h3>
+
+            <!-- Glitch Enable Toggle -->
+            <div class="control-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="glitch-enabled">
+                    <span>Enable Glitch</span>
+                </div>
+            </div>
+
+            <!-- Glitch Controls (hidden by default) -->
+            <div id="glitch-controls" style="display: none;">
+                <!-- Intensity -->
+                <div class="control-group">
+                    <label>
+                        Intensity
+                        <span id="glitch-intensity-value">0.15</span>
+                    </label>
+                    <input type="range" id="glitch-intensity" min="0" max="1" step="0.05" value="0.15">
+                </div>
+
+                <!-- Speed -->
+                <div class="control-group">
+                    <label>
+                        Speed
+                        <span id="glitch-speed-value">0.4x</span>
+                    </label>
+                    <input type="range" id="glitch-speed" min="0.1" max="5" step="0.1" value="0.35">
+                </div>
+
+                <!-- Block Size -->
+                <div class="control-group">
+                    <label>
+                        Block Size
+                        <span id="glitch-block-size-value">0.025</span>
+                    </label>
+                    <input type="range" id="glitch-block-size" min="0.01" max="0.1" step="0.005" value="0.025">
+                </div>
+
+                <!-- Color Separation -->
+                <div class="control-group">
+                    <label>
+                        Color Split
+                        <span id="glitch-color-separation-value">0.010</span>
+                    </label>
+                    <input type="range" id="glitch-color-separation" min="0" max="0.05" step="0.001" value="0.01">
+                </div>
+            </div>
+        </div>
+
+        <!-- Regenerate Button (ALWAYS KEEP THIS) -->
+        <button id="regenerate" class="action-btn">Regenerate Scene</button>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <button id="mobile-toggle" aria-label="Toggle controls">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
+    </button>
+
+    <!-- Auto-Cycle Stages Button (Floating) -->
+    <button id="auto-cycle-floating-btn" aria-label="Auto-cycle through stages" title="Auto-cycle through stages" style="display: none; opacity: 0; pointer-events: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(180deg);">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+    </button>
+
+    <!-- Clear Stage History Button (Floating) -->
+    <button id="clear-history-floating-btn" aria-label="Clear stage history" title="Clear stage history" style="display: none; opacity: 0; pointer-events: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 5"></path>
+            <path d="M3 3v6h6"></path>
+            <path d="M12 8v4l3 2"></path>
+        </svg>
+    </button>
+
+    <!-- C Signet Standalone Viewer (320x320px) -->
+    <div id="csignet-viewer" class="csignet-viewport">
+        <!-- WebGL canvas will be rendered here -->
+    </div>
+
+    <!-- Article Content Overlays -->
+    <!-- CNTM Article -->
+    <article id="cntm-article" class="content-article cntm-article" style="display: none;">
+        <div class="article-wrapper">
+            <header class="article-header">
+                <p class="article-subtitle">Connectome Manifesto '26</p>
+            </header>
+            <div class="article-content hack">
+                <p>In past decade enterprise cloud infrastructure has transcended the limits of traditional algorithmic automation.</p>
+                <p>Our distributed systems evolved&nbsp;into hyper-connected, ephemeral,&nbsp;and multi-cloud architectures&nbsp;and the complexity of managing these environments has begun&nbsp;to mirror the intricate wiring of biological nervous systems.</p>
+                <p>Here, the cloud infrastructure is no longer viewed&nbsp;as a collection of isolated servers&nbsp;and services,&nbsp;but&nbsp;as a living connectome&nbsp;where reliability is an emergent property of synaptic intelligence&nbsp;and agent friendly orchestration.</p>
+                <blockquote>
+                    <p>We proudly contribute&nbsp;to this paradigm shift:&nbsp;from static infrastructure&nbsp;to dynamic, self-aware systems&nbsp;that evolve&nbsp;and adapt&nbsp;to operational demands&nbsp;in real-time.</p>
+                </blockquote>
+            </div>
+            <button class="close-article-btn">×</button>
+        </div>
+    </article>
+
+    <!-- SRE Article -->
+    <article id="sre-article" class="content-article sre-article" style="display: none;">
+        <div class="article-wrapper">
+            <header class="article-header">
+                <p class="article-subtitle">Autonomous Reliability Engineering</p>
+            </header>
+            <div class="article-content hack">
+                <p>The emergence of Agentic Site Reliability Engineering (SRE) represents the next stage of this evolutionary trajectory—a shift&nbsp;from static, rule-based responses&nbsp;to a dynamic, multi-agent cognitive architecture capable of autonomous perception, reasoning,&nbsp;and remediation.</p>
+                <blockquote>
+                    <p>Agentic SRE transcends traditional alerting&nbsp;and response mechanisms. It introduces autonomous agents&nbsp;that not only detect failures&nbsp;but predict, prevent,&nbsp;and self-heal infrastructure anomalies before they impact users.</p>
+                </blockquote>
+                <p>These systems learn&nbsp;from historical patterns, adapt&nbsp;to environmental changes,&nbsp;and coordinate across distributed teams&nbsp;and technologies&nbsp;with minimal human intervention.</p>
+            </div>
+            <button class="close-article-btn">×</button>
+        </div>
+    </article>
+
+    <!-- SEC Article -->
+    <article id="sec-article" class="content-article sec-article" style="display: none;">
+        <div class="article-wrapper">
+            <header class="article-header">
+                <p class="article-subtitle">Intelligent Threat Response</p>
+            </header>
+            <div class="article-content hack">
+                <p>Security orchestration represents the convergence of threat detection, prevention,&nbsp;and response&nbsp;into unified agent-driven workflows.</p>
+                <p>Traditional security operations centers struggle&nbsp;to keep pace&nbsp;with the velocity&nbsp;and sophistication of modern threats. Alert fatigue, manual triage,&nbsp;and siloed tooling create dangerous gaps&nbsp;where adversaries exploit the lags between detection&nbsp;and response.</p>
+                <blockquote>
+                    <p>Intelligent security systems operate&nbsp;at the speed of machines&nbsp;while maintaining human oversight&nbsp;and strategic decision-making authority.</p>
+                </blockquote>
+                <p>Agentic security architectures transform this paradigm by deploying autonomous agents&nbsp;that correlate signals across network, endpoint, identity,&nbsp;and cloud layers&nbsp;in real-time. These agents don't just alert—they investigate, contain,&nbsp;and remediate threats before lateral movement occurs.</p>
+            </div>
+            <button class="close-article-btn">×</button>
+        </div>
+    </article>
+
+    <!-- DEV Article (Sample) -->
+    <article id="dev-article" class="content-article dev-article" style="display: none;">
+        <div class="article-wrapper">
+            <header class="article-header">
+                <p class="article-subtitle">Intelligent Development Orchestration</p>
+            </header>
+            <div class="article-content hack">
+                <p>Development workflows represent the convergence of code generation, testing,&nbsp;and deployment&nbsp;into unified agent-driven CI/CD pipelines.</p>
+                <p>Modern development practices have evolved&nbsp;to embrace autonomous systems&nbsp;that not only compile&nbsp;and test code&nbsp;but understand architectural patterns, suggest optimizations,&nbsp;and prevent regressions before they reach production.</p>
+                <blockquote>
+                    <p>Intelligent development systems accelerate innovation&nbsp;while maintaining quality standards, enabling teams&nbsp;to focus&nbsp;on higher-level design&nbsp;and strategy.</p>
+                </blockquote>
+                <p>By leveraging agent-driven workflows, development cycles become faster, more reliable,&nbsp;and infinitely more scalable across distributed teams&nbsp;and global infrastructure.</p>
+            </div>
+            <button class="close-article-btn">×</button>
+        </div>
+    </article>
+
+    <!-- OPS Article -->
+    <article id="ops-article" class="content-article ops-article" style="display: none;">
+        <div class="article-wrapper">
+            <header class="article-header">
+                <p class="article-subtitle">Cognitive Infrastructure Management</p>
+            </header>
+            <div class="article-content hack">
+                <p>Autonomous operations transform infrastructure management&nbsp;from reactive firefighting&nbsp;to proactive system optimization.</p>
+                <p>Modern infrastructure spans hybrid clouds, edge deployments,&nbsp;and ephemeral containers&nbsp;that scale dynamically&nbsp;with demand. Human operators cannot manually manage this complexity—the cognitive load exceeds human bandwidth by orders of magnitude.</p>
+                <blockquote>
+                    <p>When operations become truly autonomous, systems don't just respond&nbsp;to failures—they anticipate, evolve,&nbsp;and optimize themselves continuously.</p>
+                </blockquote>
+                <p>Cognitive operations leverage multi-agent systems&nbsp;that observe telemetry streams, model system behavior,&nbsp;and execute remediation playbooks autonomously. These agents coordinate capacity planning, cost optimization,&nbsp;and performance tuning&nbsp;while humans focus&nbsp;on architecture&nbsp;and strategy.</p>
+            </div>
+            <button class="close-article-btn">×</button>
+        </div>
+    </article>
+
+    <!-- Footer (ALWAYS KEEP THIS) -->
+    <footer id="footer">
         <ul class="copyright">
-          <li>connectome</li>
+            <li>connectome</li>
         </ul>
-
         <ul class="icons">
-          <li>
+            <li>
             <a href="mailto:anything@connectome.name" title="anything@connectome.name" target="_blank" class="icon fa-envelope-o">
-              <span class="label">anything@connectome.name</span>
+                <span class="label">anything@connectome.name</span>
             </a>
-          </li>
+            </li>
         </ul>
+    </footer>
 
-      </footer>
+    <!-- Import Map for ES Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+            "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js",
+            "three/examples/jsm/postprocessing/EffectComposer.js": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/postprocessing/EffectComposer.js",
+            "three/examples/jsm/postprocessing/RenderPass.js": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/postprocessing/RenderPass.js",
+            "three/examples/jsm/postprocessing/UnrealBloomPass.js": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+            "three/examples/jsm/postprocessing/ShaderPass.js": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/postprocessing/ShaderPass.js"
+        }
+    }
+    </script>
 
-      <div id="bg">
-        <div class="background"></div>
-        <div class="background"></div>
-        <div class="background"></div>
-        <div class="background"></div>
-      </div>
+    <!-- Baffle.js for text scramble effect -->
+    <script src="js/baffle.min.js"></script>
 
-    <!-- Scripts -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-      <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-      <script src="assets/js/actual.min.js"></script>
-      <script src="assets/js/reactome.js"></script>
-      <script src="assets/js/main.js"></script>
-      <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-        ga('create', 'UA-76905806-1', 'auto');
-        ga('send', 'pageview');
-      </script>
+    <!-- Main Application -->
+    <script type="module" src="js/main.js"></script>
 
-  </body>
+    <!-- Mobile Toggle Script -->
+    <script>
+        document.getElementById('mobile-toggle').addEventListener('click', function() {
+            document.getElementById('control-panel').classList.toggle('collapsed');
+        });
+    </script>
+
+    <!-- Connectome Navigation Baffle Effect with Frequency Modulation -->
+    <script>
+        if (typeof baffle !== 'undefined') {
+            var navLinks = document.querySelectorAll('.nav-link');
+            var baffleInstances = {};
+            var activeLink = null;
+            var frequencyModulationActive = false;
+
+            navLinks.forEach(function(link) {
+                // Create baffle instance for each link
+                baffleInstances[link.textContent] = baffle(link, {
+                    characters: 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz~!@#$%^&*',
+                    speed: 50
+                });
+
+                // On hover, start baffle effect and reveal
+                link.addEventListener('mouseenter', function() {
+                    var instance = baffleInstances[link.textContent];
+                    instance.start();
+                    setTimeout(function() {
+                        instance.reveal(600);
+                    }, 300);
+                });
+
+                // On click, set as active
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Remove active class from all links
+                    navLinks.forEach(function(l) {
+                        l.classList.remove('active');
+                    });
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    activeLink = this;
+                    startFrequencyModulation();
+                });
+            });
+
+            // Set first link as active by default
+            if (navLinks.length > 0) {
+                navLinks[0].classList.add('active');
+                activeLink = navLinks[0];
+                startFrequencyModulation();
+            }
+
+            // Frequency Modulation: Trigger baffle effect on active element at irregular intervals
+            function startFrequencyModulation() {
+                if (frequencyModulationActive) return;
+                frequencyModulationActive = true;
+
+                function triggerBaffle() {
+                    if (activeLink && activeLink.classList.contains('active')) {
+                        var instance = baffleInstances[activeLink.textContent];
+                        if (instance) {
+                            instance.start();
+                            setTimeout(function() {
+                                instance.reveal(400);
+                            }, 200);
+                        }
+                    }
+                }
+
+                // Frequency modulation with irregular intervals
+                function scheduleNextTrigger() {
+                    // Use sine wave modulation + randomness for irregular but flowing intervals
+                    var now = Date.now();
+                    var baseFrequency = 5000; // base interval in ms
+                    var modulation = Math.sin(now / 5000) * 1500; // sine modulation
+                    var randomness = Math.random() * 1000; // randomness
+                    var interval = baseFrequency + modulation + randomness;
+
+                    setTimeout(function() {
+                        triggerBaffle();
+                        scheduleNextTrigger(); // reschedule
+                    }, Math.abs(interval));
+                }
+
+                scheduleNextTrigger();
+            }
+
+            // Initialize baffle instances for all article text elements
+            window.articleBaffleInstances = {};
+            var articles = document.querySelectorAll('.content-article');
+            articles.forEach(function(article) {
+                var textElements = article.querySelectorAll('p, h2, .article-subtitle');
+                textElements.forEach(function(el) {
+                    var key = article.id + '-' + el.textContent.substring(0, 20);
+                    window.articleBaffleInstances[key] = baffle(el, {
+                        characters: 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz~!@#$%^&*',
+                        speed: 40
+                    });
+                });
+            });
+
+            // Make baffleInstances global for nav links too
+            window.baffleInstances = baffleInstances;
+        }
+    </script>
+
+    <!-- Google Analytics Scripts -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-76905806-1', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+</body>
 </html>
