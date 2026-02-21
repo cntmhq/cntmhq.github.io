@@ -1,4 +1,4 @@
-/* @import url(font-awesome.min.css); */
+@import url(font-awesome.min.css);
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=latin,latin-ext);
 
 /* Reset */
@@ -1640,12 +1640,12 @@ padding: 1em 2em 0em;
 /* Connectome Top Navigation */
 .connectome-nav {
     position: fixed;
-    top: 20px;
-    left: 0;
+    top: 15px;
+    left: 80px;
     right: 0;
     height: auto;
     background: transparent;
-    z-index: 1000;
+    z-index: 10010;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1709,7 +1709,7 @@ body {
     /* border-radius: 4px; */
     background-color: transparent;
     /* box-shadow: 0 0 20px rgba(28, 180, 149, 0.1); */
-    z-index: 1001;
+    z-index: 10001;
 }
 
 #csignet-viewer canvas {

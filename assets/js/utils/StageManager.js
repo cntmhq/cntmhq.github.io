@@ -115,6 +115,7 @@ export class StageManager {
                     connectomeRoughness: 1.0,
                     csignetMetalness: 0.1,
                     headerOpacity: 0.0,
+                    headerPosX: 0.90,
                     headerPosY: 3.15,
                     headerScale: 0.75
                 }
@@ -126,13 +127,14 @@ export class StageManager {
                     cameraDistance: 6.0,
                     opacity: 0.14,
                     connectomeOpacity: 1.0,
-                    connectomeMetalness: 0.1,
+                    connectomeMetalness: 0.125,
                     connectomePosX: 0.80,
                     connectomePosY: 3.00,
                     connectomePosZ: 0.00,
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.15,
-                    headerOpacity: 0.5,
+                    headerOpacity: 0.7,
+                    headerPosX: 0.90,
                     headerPosY: 3.10
                 }
             },
@@ -150,6 +152,7 @@ export class StageManager {
                     connectomeRoughness: 0.9,
                     csignetMetalness: 0.25,
                     headerOpacity: 0.8,
+                    headerPosX: 0.90,
                     headerPosY: 1.15
                 }
             },
@@ -167,6 +170,7 @@ export class StageManager {
                     connectomeRoughness: 0.4,
                     csignetMetalness: 0.4,
                     headerOpacity: 0.8,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             },
@@ -184,6 +188,7 @@ export class StageManager {
                     connectomeRoughness: 0.4,
                     csignetMetalness: 0.5,
                     headerOpacity: 0.8,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             },
@@ -201,6 +206,7 @@ export class StageManager {
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.35,
                     headerOpacity: 0.8,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             },
@@ -210,7 +216,7 @@ export class StageManager {
                 values: {
                     // cameraDistance: 0.55,
                     cameraDistance: 0.1,
-                    opacity: 0.05,
+                    opacity: 0.075,
                     connectomeOpacity: 1.0,
                     connectomeMetalness: 0.5,
                     // connectomePosX: 0.155,
@@ -220,6 +226,7 @@ export class StageManager {
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.15,
                     headerOpacity: 0.0,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             },
@@ -237,6 +244,7 @@ export class StageManager {
                     connectomeRoughness: 0.6,
                     csignetMetalness: 0.2,
                     headerOpacity: 0.0,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             },
@@ -254,14 +262,17 @@ export class StageManager {
                     connectomeRoughness: 0.6,
                     csignetMetalness: 0.3,
                     headerOpacity: 0.0,
+                    headerPosX: 0.90,
                     headerPosY: 0.55
                 }
             }
 
         ];
 
-        // Store current animated values
-        this.currentValues = { ...this.stages[0].values };
+        // Store current animated values with media query adjustments
+        // Apply responsive adjustments on initial load
+        const initialStageValues = { ...this.stages[0].values };
+        this.currentValues = this.applyMediaQueryAdjustments(initialStageValues);
     }
 
     /**
@@ -313,7 +324,10 @@ export class StageManager {
         const onComplete = options.onComplete || (() => {});
 
         const startValues = { ...this.currentValues };
-        const targetValues = this.stages[targetStage].values;
+        let targetValues = this.stages[targetStage].values;
+
+        // Apply media query adjustments to target values
+        targetValues = this.applyMediaQueryAdjustments(targetValues);
 
         return new Promise((resolve) => {
             this.isTransitioning = true;
@@ -510,7 +524,9 @@ export class StageManager {
      */
     reset() {
         this.currentStage = 0;
-        this.currentValues = { ...this.stages[0].values };
+        const stageValues = { ...this.stages[0].values };
+        // Apply media query adjustments to initial stage
+        this.currentValues = this.applyMediaQueryAdjustments(stageValues);
         this._applyValues(this.currentValues);
     }
 
@@ -536,6 +552,31 @@ export class StageManager {
      */
     getIsTransitioning() {
         return this.isTransitioning;
+    }
+
+    /**
+     * Apply media query adjustments to stage values
+     * Modifies stage position values based on viewport width
+     * @param {Object} values - Stage values to adjust
+     * @returns {Object} Adjusted values
+     */
+    applyMediaQueryAdjustments(values) {
+        const isMobile = window.innerWidth < 720;
+        const adjusted = { ...values };
+
+        if (isMobile) {
+            // Mobile adjustments (< 720px)
+            // Move logo left and center header
+            adjusted.connectomePosX = -0.10;
+            adjusted.connectomePosY = 1.50;
+            adjusted.headerPosX = 0.00;
+            adjusted.headerPosY = 1.60;
+        } else {
+            // Desktop adjustments (>= 720px) - use original stage values
+            // connectomePosX and headerPosX are already set in stage definition
+        }
+
+        return adjusted;
     }
 
     /**

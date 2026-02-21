@@ -39,6 +39,21 @@ import { StageManager, Easing } from './utils/StageManager.js';
     The world is your oyster - be creative!
 **/
 /**
+ * Get responsive configuration based on viewport width
+ * @returns {Object} Configuration with media query adjustments
+ */
+function getResponsiveConfig() {
+    const isMobile = window.innerWidth < 720;
+
+    return {
+        // Mobile: move logo left and center header
+        // Note: Scale is NOT adjusted - only positions change for mobile
+        connectomePosX: isMobile ? -0.10 : 0.8,
+        headerPosX: isMobile ? 0.00 : 0.90
+    };
+}
+
+/**
  * Default configuration values
  * Centralized for easy access by UI synchronization
  */
@@ -67,9 +82,9 @@ export const DEFAULT_CONFIG = {
     rgbShift: 0.002,
     // Connectome Logo defaults (Thin Profile)
     connectomeEnabled: true,
-    // Position & Scale
+    // Position (responsive X-axis only)
+    ...getResponsiveConfig(),
     connectomeScale: CONNECTOME_LOGO_CONFIG.scale,
-    connectomePosX: 0.8,
     connectomePosY: 3.0,
     connectomePosZ: 0.0001,
     connectomeRotX: 0.0001,
@@ -112,7 +127,6 @@ export const DEFAULT_CONFIG = {
     headerEnabled: true,
     headerScale: 0.25,
     headerOpacity: 0.0,
-    headerPosX: 0.90,
     headerPosY: 3.1,
     headerPosZ: 0.35,
     headerRotX: -1.57,
@@ -217,6 +231,12 @@ export class ReactomeApp {
         this._createEffects();
         this._setupEventListeners();
         this._createStageManager();
+
+        // Apply responsive layout on initial load
+        // Use a small delay to ensure all objects are fully created
+        setTimeout(() => {
+            this._updateResponsiveLayout();
+        }, 100);
     }
 
     /**
@@ -548,6 +568,30 @@ export class ReactomeApp {
         if (this.effects) {
             this.effects.resize(width, height);
         }
+
+        // Update responsive layout for mobile/tablet
+        this._updateResponsiveLayout();
+    }
+
+    /**
+     * Update responsive layout based on viewport width
+     * Applies media query adjustments for mobile screens (< 720px)
+     * Only applies X-axis position changes (Y-axis is handled by StageManager)
+     */
+    _updateResponsiveLayout() {
+        const responsiveConfig = getResponsiveConfig();
+
+        // Update Connectome logo position X only
+        // Note: Y position is handled by StageManager during transitions
+        if (this.connectomeLogo) {
+            this.connectomeLogo.position.x = responsiveConfig.connectomePosX;
+        }
+
+        // Update header position X only
+        // Note: Y position is handled by StageManager during transitions
+        if (this.headerMesh) {
+            this.headerMesh.position.x = responsiveConfig.headerPosX;
+        }
     }
 
     /**
@@ -637,7 +681,12 @@ export class ReactomeApp {
         // Update cSignet visibility based on camera distance (if cSignetApp is available)
         if (typeof window.cSignetApp !== 'undefined' && window.cSignetApp) {
             const cameraDistance = this.getCameraDistance();
-            window.cSignetApp.setVisibilityByDistance(cameraDistance < 1);
+            const isMobile = window.innerWidth < 720;
+            if (!isMobile) {
+                window.cSignetApp.setVisibilityByDistance(cameraDistance < 1);
+            } else {
+                window.cSignetApp.setVisibilityByDistance(cameraDistance < 10);
+            }
         }
 
         // Animate objects with speed multiplier
