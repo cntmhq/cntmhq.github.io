@@ -34,7 +34,8 @@ const urlRouteMap = {
     'sre': 5,
     'sec': 6,
     'dev': 7,
-    'ops': 8
+    'ops': 8,
+    'about': 'about'  // Special route for About Us article
 };
 
 const stageToUrlMap = {
@@ -47,7 +48,8 @@ const stageToUrlMap = {
     6: 'sec',
     7: 'dev',
     8: 'ops',
-    9: ''         // Internal
+    9: '',        // Internal
+    'about': 'about'  // About Us article route
 };
 
 // Stage button references for global access
@@ -87,6 +89,12 @@ function navigateFromUrl() {
         if (app && app.getCurrentStage() !== 0) {
             transitionToStageWithUrl(0, { duration: 1000 });
         }
+        return;
+    }
+
+    // Check if it's the about route
+    if (hash === 'about') {
+        showArticle('about-article');
         return;
     }
 
@@ -1171,23 +1179,44 @@ function showArticle(articleId) {
 function closeArticle(articleId) {
     const article = document.getElementById(articleId);
     if (article) {
-        if (!app.isTransitioning()) {
-            article.classList.add('fade-out');
-            setTimeout(() => {
-                article.classList.remove('active', 'fade-out');
-                article.style.display = 'none';
-            }, 200);
-            transitionToStageWithUrl(1, {
-                captureActualState: true,
-                duration: 1000,
-                onComplete: () => {
-                    updateNavigationLinkStates();
-                    updateStageButtonStates();
-                    app.stageManager.saveState();
-                }
-            });
-            updateNavigationLinkStates();
-            updateStageButtonStates();
+        article.classList.add('fade-out');
+        setTimeout(() => {
+            article.classList.remove('active', 'fade-out');
+            article.style.display = 'none';
+        }, 200);
+
+        // Special handling for about article - return to home (stage 1)
+        if (articleId === 'about-article') {
+            // Reset hash to home
+            window.location.hash = '#env';
+            if (!app.isTransitioning()) {
+                transitionToStageWithUrl(1, {
+                    captureActualState: true,
+                    duration: 1000,
+                    onComplete: () => {
+                        updateNavigationLinkStates();
+                        updateStageButtonStates();
+                        app.stageManager.saveState();
+                    }
+                });
+                updateNavigationLinkStates();
+                updateStageButtonStates();
+            }
+        } else {
+            // Regular article closing - return to stage 1
+            if (!app.isTransitioning()) {
+                transitionToStageWithUrl(1, {
+                    captureActualState: true,
+                    duration: 1000,
+                    onComplete: () => {
+                        updateNavigationLinkStates();
+                        updateStageButtonStates();
+                        app.stageManager.saveState();
+                    }
+                });
+                updateNavigationLinkStates();
+                updateStageButtonStates();
+            }
         }
     }
 }
@@ -1327,10 +1356,12 @@ function setupFooterCopyrightClick() {
     const copyrightElement = footer.querySelector('.copyright');
     if (copyrightElement) {
         // Make it clickable by converting to a button-like element
-        copyrightElement.style.cursor = 'help';
+        copyrightElement.style.cursor = 'pointer';
         copyrightElement.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            // Update URL hash to about route
+            window.location.hash = '#about';
             showArticle('about-article');
         });
     }
