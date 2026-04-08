@@ -115,7 +115,7 @@ export class StageManager {
                     connectomeRoughness: 1.0,
                     csignetMetalness: 0.1,
                     headerOpacity: 0.0,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 3.15,
                     headerScale: 0.75
                 }
@@ -134,7 +134,7 @@ export class StageManager {
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.15,
                     headerOpacity: 0.7,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 3.10
                 }
             },
@@ -152,7 +152,7 @@ export class StageManager {
                     connectomeRoughness: 0.9,
                     csignetMetalness: 0.25,
                     headerOpacity: 0.8,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 1.15
                 }
             },
@@ -170,7 +170,7 @@ export class StageManager {
                     connectomeRoughness: 0.4,
                     csignetMetalness: 0.4,
                     headerOpacity: 0.8,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             },
@@ -188,7 +188,7 @@ export class StageManager {
                     connectomeRoughness: 0.4,
                     csignetMetalness: 0.5,
                     headerOpacity: 0.8,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             },
@@ -206,7 +206,7 @@ export class StageManager {
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.35,
                     headerOpacity: 0.8,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             },
@@ -226,7 +226,7 @@ export class StageManager {
                     connectomeRoughness: 0.8,
                     csignetMetalness: 0.15,
                     headerOpacity: 0.0,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             },
@@ -244,7 +244,7 @@ export class StageManager {
                     connectomeRoughness: 0.6,
                     csignetMetalness: 0.2,
                     headerOpacity: 0.0,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             },
@@ -262,7 +262,7 @@ export class StageManager {
                     connectomeRoughness: 0.6,
                     csignetMetalness: 0.3,
                     headerOpacity: 0.0,
-                    headerPosX: 0.90,
+                    headerPosX: 0.70,
                     headerPosY: 0.55
                 }
             }
@@ -569,7 +569,7 @@ export class StageManager {
             // Move logo left and center header
             adjusted.connectomePosX = -0.10;
             adjusted.connectomePosY = 1.50;
-            adjusted.headerPosX = 0.00;
+            adjusted.headerPosX = -0.15;
             adjusted.headerPosY = 1.60;
         } else {
             // Desktop adjustments (>= 720px) - use original stage values

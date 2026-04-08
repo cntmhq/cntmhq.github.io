@@ -48,7 +48,7 @@ function getResponsiveConfig() {
     return {
         // Mobile: move logo left and center header
         // Note: Scale is NOT adjusted - only positions change for mobile
-        connectomePosX: isMobile ? -0.10 : 0.8,
+        connectomePosX: isMobile ? -0.10 : 0.80,
         headerPosX: isMobile ? 0.00 : 0.90
     };
 }
@@ -128,6 +128,7 @@ export const DEFAULT_CONFIG = {
     headerScale: 0.25,
     headerOpacity: 0.0,
     headerPosY: 3.1,
+    headerPosX: 0.70,
     headerPosZ: 0.35,
     headerRotX: -1.57,
     headerRotY: 0.0,
@@ -167,8 +168,6 @@ export const svgData = `
                     C241,35.5,238.4,38.2,238.1,43.4z"/>
     </g>
 </svg>`;
-
-
 
 /**
  * Main Reactome Visualization Application
@@ -487,7 +486,7 @@ export class ReactomeApp {
      * Create header mesh with canvas texture (replaces CSS3DObject)
      */
     _createHeaderMesh() {
-        const CW = 512, CH = 128;
+        const CW = 640, CH = 128;
         const canvas = document.createElement('canvas');
         canvas.width = CW;
         canvas.height = CH;
@@ -496,7 +495,7 @@ export class ReactomeApp {
 
         // Plane sized to match text aspect ratio (512:128 = 4:1)
         // Default scale 1.0 → world width ~2.0
-        const planeW = 2.0, planeH = 0.5;
+        const planeW = 2.5, planeH = 0.5;
         const geometry = new THREE.PlaneGeometry(planeW, planeH);
         const material = new THREE.MeshBasicMaterial({
             map: texture,
@@ -506,6 +505,16 @@ export class ReactomeApp {
             side: THREE.DoubleSide
         });
 
+        // Initialize tagline animation state
+        this.taglineWords = ['Agent', 'Data', 'SRE', 'Security', 'Developer', 'Operations'];
+        this.taglineCurrentIndex = 0;
+        this.taglineAnimating = false;
+        this.taglineAnimationTime = 0;
+        this.taglineCycleStart = Date.now();
+        this.taglineCycleDuration = 5000; // 5 seconds per word
+        this.taglineGlitchDuration = 500; // Glitch transition duration
+        this.taglineGlitchCharacters = '▓░▒█▀▄╤╥╦═╝╚╔╗▓▔╩╨╧┤├┼┴┬┌└┘•°•°';
+
         // Draw text once font is loaded (fire-and-forget, falls back to system sans-serif)
         const drawText = () => {
             const ctx = canvas.getContext('2d');
@@ -513,19 +522,25 @@ export class ReactomeApp {
             ctx.textAlign = 'right';
             ctx.fillStyle = 'rgba(200,200,200,0.85)';
             ctx.font = 'bold 36px "Open Sans", sans-serif';
-            ctx.fillText('Agent Friendly Automation', CW - 8, 50);
+            ctx.fillText(this.taglineWords[this.taglineCurrentIndex] + ' Friendly Automation', CW - 8, 50);
             ctx.fillStyle = 'rgba(28,180,149,0.85)';
             ctx.font = '400 36px "Open Sans", sans-serif';
             ctx.fillText('FOSS Cloud Native Workflows', CW - 8, 96);
             texture.needsUpdate = true;
         };
+
+        // Store references for update loop
+        this.headerCanvas = canvas;
+        this.headerTexture = texture;
+        this.headerDrawText = drawText;
+
         document.fonts.load('400 36px "Open Sans"').then(drawText).catch(drawText);
 
         this.headerMesh = new THREE.Mesh(geometry, material);
 
         // Apply default transform (matching former CSS3D defaults)
         this.headerMesh.position.set(
-            DEFAULT_CONFIG.headerPosX ?? 1.15,
+            DEFAULT_CONFIG.headerPosX ?? 1.7,
             DEFAULT_CONFIG.headerPosY ?? 3.1,
             DEFAULT_CONFIG.headerPosZ ?? 0.35
         );
@@ -537,6 +552,99 @@ export class ReactomeApp {
 
         this.headerMesh.visible = DEFAULT_CONFIG.headerEnabled ?? true;
         this.scene.add(this.headerMesh);
+    }
+
+    /**
+     * Update tagline animation in the animation loop
+     */
+    _updateTaglineAnimation() {
+        if (!this.headerCanvas || !this.headerTexture) return;
+
+        const now = Date.now();
+        const elapsed = now - this.taglineCycleStart;
+
+        // Check if it's time to transition to next word
+        if (elapsed >= this.taglineCycleDuration) {
+            this.taglineCurrentIndex = (this.taglineCurrentIndex + 1) % this.taglineWords.length;
+            this.taglineCycleStart = now;
+            this.taglineAnimating = true;
+            this.taglineAnimationTime = 0;
+        }
+
+        // Handle glitch animation during transition
+        if (this.taglineAnimating) {
+            this.taglineAnimationTime += 16; // ~60fps delta
+            const glitchProgress = Math.min(this.taglineAnimationTime / this.taglineGlitchDuration, 1);
+
+            if (glitchProgress < 1) {
+                this._drawTaglineWithGlitch(glitchProgress);
+            } else {
+                this.taglineAnimating = false;
+                this._drawTaglineClear();
+            }
+        }
+    }
+
+    /**
+     * Draw tagline with glitch effect
+     */
+    _drawTaglineWithGlitch(progress) {
+        const ctx = this.headerCanvas.getContext('2d');
+        const CW = this.headerCanvas.width;
+        const CH = this.headerCanvas.height;
+
+        ctx.clearRect(0, 0, CW, CH);
+
+        const currentWord = this.taglineWords[this.taglineCurrentIndex];
+        const taglineText = currentWord + ' Friendly Automation';
+
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 36px "Open Sans", sans-serif';
+
+        // Scramble effect throughout transition (no fade out)
+        const scrambledWord = this._scrambleText(currentWord, 1 - progress);
+        ctx.fillStyle = 'rgba(200,200,200,0.85)';
+        ctx.fillText(scrambledWord + ' Friendly Automation', CW - 8, 50);
+
+        ctx.fillStyle = 'rgba(28,180,149,0.85)';
+        ctx.font = '400 36px "Open Sans", sans-serif';
+        ctx.fillText('FOSS Cloud Native Workflows', CW - 8, 96);
+
+        this.headerTexture.needsUpdate = true;
+    }
+
+    /**
+     * Draw tagline clearly
+     */
+    _drawTaglineClear() {
+        const ctx = this.headerCanvas.getContext('2d');
+        const CW = this.headerCanvas.width;
+        const CH = this.headerCanvas.height;
+
+        ctx.clearRect(0, 0, CW, CH);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(200,200,200,0.85)';
+        ctx.font = 'bold 36px "Open Sans", sans-serif';
+        ctx.fillText(this.taglineWords[this.taglineCurrentIndex] + ' Friendly Automation', CW - 8, 50);
+        ctx.fillStyle = 'rgba(28,180,149,0.85)';
+        ctx.font = '400 36px "Open Sans", sans-serif';
+        ctx.fillText('FOSS Cloud Native Workflows', CW - 8, 96);
+
+        this.headerTexture.needsUpdate = true;
+    }
+
+    /**
+     * Scramble text with glitch characters
+     */
+    _scrambleText(text, intensity) {
+        return text.split('').map((char) => {
+            if (Math.random() < intensity) {
+                return this.taglineGlitchCharacters[
+                    Math.floor(Math.random() * this.taglineGlitchCharacters.length)
+                ];
+            }
+            return char;
+        }).join('');
     }
 
 
@@ -662,6 +770,10 @@ export class ReactomeApp {
      * Animation loop tick
      */
     _tick() {
+        // Keep requesting frames even when paused - this allows smooth resume
+        requestAnimationFrame(() => this._tick());
+
+        // Skip updates if paused, but keep the loop alive
         if (!this.isRunning) return;
 
         const delta = this.clock.getDelta();
@@ -677,6 +789,9 @@ export class ReactomeApp {
             const targetZOffset = this._calculateCameraZOffset(this.cameraZElapsedTime);
             this.camera.position.z = targetZOffset;
         }
+
+        // Update tagline animation
+        this._updateTaglineAnimation();
 
         // Update cSignet visibility based on camera distance (if cSignetApp is available)
         if (typeof window.cSignetApp !== 'undefined' && window.cSignetApp) {
@@ -701,8 +816,6 @@ export class ReactomeApp {
         } else {
             this.renderer.render(this.scene, this.camera);
         }
-
-        requestAnimationFrame(() => this._tick());
     }
 
     // ==================== Public API ====================
@@ -724,6 +837,23 @@ export class ReactomeApp {
     stop() {
         this.isRunning = false;
         return this;
+    }
+
+    /**
+     * Toggle pause/resume animation (maintains clock state)
+     * @returns {boolean} New paused state
+     */
+    togglePause() {
+        this.isRunning = !this.isRunning;
+        return !this.isRunning; // Return true if now paused
+    }
+
+    /**
+     * Check if animation is paused
+     * @returns {boolean}
+     */
+    isPaused() {
+        return !this.isRunning;
     }
 
     /**
@@ -1499,6 +1629,12 @@ export class CSignetApp {
         this.returnStartTime = 0;
         this.returnStartOffset = new THREE.Vector3(0, 0, 0);
         this.zeroOffset = new THREE.Vector3(0, 0, 0); // Target offset (home)
+        this.pointerDownOnHitbox = false;
+        this.interactionMoved = false;
+        this.interactionStartTime = 0;
+        this.interactionStartClient = new THREE.Vector2();
+        this.clickMoveThresholdPx = 8;
+        this.clickTimeThresholdMs = 300;
 
         // Raycaster for interaction
         this.raycaster = new THREE.Raycaster();
@@ -1646,9 +1782,14 @@ export class CSignetApp {
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObject(this.cSignetHitbox);
 
+        this.pointerDownOnHitbox = false;
         if (intersects.length > 0) {
             this.isDragging = true;
             this.dragStartPos.copy(this.mouse);
+            this.pointerDownOnHitbox = true;
+            this.interactionMoved = false;
+            this.interactionStartTime = Date.now();
+            this.interactionStartClient.set(x, y);
         }
     }
 
@@ -1678,6 +1819,12 @@ export class CSignetApp {
             this.currentOffset.y = normalizedDrag.y * constrainedMagnitude;
         }
 
+        const dx = x - this.interactionStartClient.x;
+        const dy = y - this.interactionStartClient.y;
+        if (Math.hypot(dx, dy) > this.clickMoveThresholdPx) {
+            this.interactionMoved = true;
+        }
+
         this.isReturning = false;
     }
 
@@ -1687,10 +1834,22 @@ export class CSignetApp {
     _onInteractionEnd(event) {
         if (!this.isDragging) return;
 
+        const interactionDuration = Date.now() - this.interactionStartTime;
+        const isClick =
+            this.pointerDownOnHitbox &&
+            !this.interactionMoved &&
+            interactionDuration <= this.clickTimeThresholdMs;
+
         this.isDragging = false;
         this.isReturning = true;
         this.returnStartTime = Date.now();
         this.returnStartOffset.copy(this.currentOffset);
+
+        this.pointerDownOnHitbox = false;
+
+        if (isClick && typeof this.options.onSignetClick === 'function') {
+            this.options.onSignetClick();
+        }
     }
 
     /**

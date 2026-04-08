@@ -228,11 +228,8 @@ function restoreSavedStage() {
  * Hides certain UI elements until user clicks C Signet 3 times in a row
  */
 function initializeHiddenUIElements() {
-    // Setup C Signet click detection (elements are already hidden via inline styles)
-    const cSignetViewer = document.getElementById('csignet-viewer');
-    if (cSignetViewer) {
-        cSignetViewer.addEventListener('click', handleCSignetClick);
-    }
+    // C Signet click detection is handled by CSignetApp hitbox callbacks.
+    // Keep this initializer for future hidden-UI setup.
 }
 
 /**
@@ -309,7 +306,27 @@ function init() {
         container: cSignetContainer,
         size: 320,
         backgroundColor: 0x000000,
-        backgroundAlpha: 0
+        backgroundAlpha: 0,
+        onSignetClick: () => {
+            handleCSignetClick();
+
+            if (!app || app.isTransitioning()) return;
+            if (app.getCurrentStage() === 1) return;
+
+            // Keep C Signet click behavior aligned with nav clicks:
+            // close any open article overlay before moving to Reveal.
+            closeAllArticles();
+
+            transitionToStageWithUrl(1, {
+                captureActualState: true,
+                duration: 1000,
+                onComplete: () => {
+                    updateStageButtonStates();
+                    updateNavigationLinkStates();
+                    app.stageManager.saveState();
+                }
+            });
+        }
     });
 
     // Link CSignetApp to ReactomeApp for stage transitions
@@ -378,6 +395,9 @@ function init() {
         }
     };
     console.log('Stage debug helpers available: window.stageDebug.clearSavedStage(), .getCurrentStage(), .getSavedStage(), .resetToInitial()');
+
+    // Render JARVIS cards in article sections
+    renderCards();
 
     // Oscillate between stages
     // let direction = 1;
@@ -1036,6 +1056,20 @@ function setupUIControls() {
         (v) => (v * 180 / Math.PI).toFixed(0) + '°'
     );
 
+    // === Pause/Play Button with Standby Icon "(|)" ===
+    const pauseBtn = document.getElementById('pause-btn');
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            const isPaused = app.togglePause();
+            // Update button class to reflect paused state
+            if (isPaused) {
+                pauseBtn.classList.add('paused');
+            } else {
+                pauseBtn.classList.remove('paused');
+            }
+        });
+    }
+
     // === Panel Toggle ===
     const panelToggleBtn = document.getElementById('panel-toggle-btn');
     const controlPanel = document.getElementById('control-panel');
@@ -1280,6 +1314,25 @@ function updateNavigationLinkStates() {
                 }, 200);
             }
         }
+    }
+}
+
+/**
+ * Setup footer copyright click handler to show About Us article
+ */
+function setupFooterCopyrightClick() {
+    const footer = document.getElementById('footer');
+    if (!footer) return;
+
+    const copyrightElement = footer.querySelector('.copyright');
+    if (copyrightElement) {
+        // Make it clickable by converting to a button-like element
+        copyrightElement.style.cursor = 'help';
+        copyrightElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            showArticle('about-article');
+        });
     }
 }
 
@@ -1539,6 +1592,9 @@ function setupStageButtons() {
     // === Setup Navigation Links ===
     setupNavigationLinks();
 
+    // === Setup Footer Copyright Click Handler ===
+    setupFooterCopyrightClick();
+
 }
 
 /**
@@ -1557,6 +1613,131 @@ function setupRangeControl(sliderId, valueId, onChange, formatter) {
             }
         });
     }
+}
+
+/**
+ * Generate a random ID (matching standalone.html pattern)
+ */
+function randomId() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(s) {
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+/**
+ * Render JARVIS cards exactly as they appear in standalone.html
+ * Using the exact HTML structure from standalone.html
+ */
+function renderCards() {
+    const roles = [
+        {
+            id: "sre",
+            containerId: "sre-cards",
+            title: "SITE RELIABILITY ENGINEERING",
+            svcStatus: "ACTIVELY RECRUITING PROJECTS",
+            metrics: ["CLOUD MIGRATIONS", "SLOs, SLAs, SLIs", "LGTM Stack"],
+            email: "sre+anything@connectome.name",
+        },
+        {
+            id: "secops",
+            containerId: "sec-cards",
+            title: "SECURITY",
+            svcStatus: "ACTIVELY RECRUITING PROJECTS",
+            metrics: ["POLICIES & RBAC", "CLOUD COMPLIANCE", "CLOUD TRAILS"],
+            email: "secops+anything@connectome.name",
+        },
+        {
+            id: "devops",
+            containerId: "dev-cards",
+            title: "DEVOPS & PLATFORM DEVELOPMENT",
+            svcStatus: "ACTIVELY RECRUITING PROJECTS",
+            metrics: ["CLOUD AUTOMATION", "PLATFORM DEVELOPMENT", "IaaC & GITOPS"],
+            email: "devops+anything@connectome.name",
+        },
+        {
+            id: "operations",
+            containerId: "ops-cards",
+            title: "STRATEGY & OPERATIONS",
+            svcStatus: "ACTIVELY RECRUITING PROJECTS",
+            metrics: ["DESIGN & PLANNING", "CLOUD ORCHESTRATION", "CLOUD MAINTANANCE"],
+            email: "ops+anything@connectome.name",
+        },
+    ];
+
+    // Render cards for each role into their respective containers
+    roles.forEach(role => {
+        const container = document.getElementById(role.containerId);
+
+        if (!container) return;
+
+        const rid = randomId();
+        const metricsHtml = role.metrics
+            .map(m => `<div class="metric"><span class="metric-chevron">&gt;</span> ${escapeHtml(m)}</div>`)
+            .join("");
+
+        const mailto = `mailto:${role.email}?subject=${encodeURIComponent(`${role.title} Inquiry`)}`;
+
+        const cardHtml = `<article class="card" data-role="${escapeHtml(role.id)}">
+            <span class="corner corner--tl" aria-hidden="true"></span>
+            <span class="corner corner--tr" aria-hidden="true"></span>
+            <span class="corner corner--bl" aria-hidden="true"></span>
+            <span class="corner corner--br" aria-hidden="true"></span>
+            <div class="scanline" aria-hidden="true"></div>
+            <div class="hud" aria-hidden="true">
+                <div class="hud-ring hud-ring--1"></div>
+                <div class="hud-ring hud-ring--2"></div>
+                <div class="hud-line-h"></div>
+                <div class="hud-line-v"></div>
+            </div>
+            <div class="card-inner">
+                <div class="card-top">
+                    <div>
+                        <div class="protocol-label">CONNECTOME</div>
+                        <h2 class="card-title">${escapeHtml(role.title)}</h2>
+                    </div>
+                    <div class="card-id-block">
+                        <div>FORM ID: ${escapeHtml(rid)}</div>
+                        <div class="card-version">v2.4.1</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="svc-row">
+                        <span class="svc-dot" aria-hidden="true"></span>
+                        SERVICE STATUS: ${escapeHtml(role.svcStatus)}
+                    </div>
+                    <div class="metrics">
+                        ${metricsHtml}
+                    </div>
+                </div>
+                <a class="cta" href="${mailto}" title="Transmit Inquiry">
+                    <span class="cta-shimmer" aria-hidden="true"></span>
+                    <span class="cta-inner">
+                        <span class="cta-line" aria-hidden="true"></span>
+                        <span class="cta-icon-wrap">
+                            <svg class="cta-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <svg class="cta-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+                            </svg>
+                        </span>
+                        <span class="cta-line" aria-hidden="true"></span>
+                    </span>
+                </a>
+            </div>
+        </article>`;
+
+        container.innerHTML = cardHtml;
+    });
 }
 
 // Initialize when DOM is ready

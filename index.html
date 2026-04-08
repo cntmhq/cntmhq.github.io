@@ -18,14 +18,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="description" content="Reactome 3D Visualization - Interactive WebGL scene with Three.js">
+    <meta name="description" content="Connectome.name - Collaborative IT think-thank">
     <title>connectome</title>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body style="backgroung-color:black!important">
-    <!-- Brand  (ALWAYS KEEP THIS) -->
-    <!-- <img class="logo" src="connectome_logo_shadow_reactome.svg" style="margin: 3px -4px;" /> -->
-    <!-- <img class="logo" src="connectome_logo_green_reactome.svg" /> -->
 
     <!-- space-around (ALWAYS KEEP THIS) -->
     <div class="space"></div>
@@ -33,7 +30,7 @@
     <!-- Connectome Top Navigation (FIXED CENTERED) -->
     <nav id="connectome-nav" class="connectome-nav">
         <div class="nav-container">
-            <a href="#" id="nav-reveal" class="nav-link active">!#/usr/bin/env cntm</a>
+            <!-- <a href="#" id="nav-reveal" class="nav-link active">!#/usr/bin/env cntm</a> -->
             <a href="#" id="nav-sre" class="nav-link">~/.sre</a>
             <a href="#" id="nav-sec" class="nav-link">~/.sec</a>
             <a href="#" id="nav-dev" class="nav-link">~/.dev</a>
@@ -44,7 +41,7 @@
     <!-- Header (ALWAYS KEEP THIS) -->
     <header id="header">
         <h1><span class="word">connectome</span></h1>
-        <p><strong>Agent Friendly Automation</strong> </br> FOSS Cloud Native Workflows</p>
+        <p><strong><span id="tagline-word">DevOps</span> Friendly Automation</strong> </br> FOSS Cloud Native Workflows</p>
     </header>
 
 
@@ -64,9 +61,7 @@
             <h2>Controls</h2>
         </div>
 
-        <!-- Headers (CUSTOMIZE THIS FOR YOUR ART) -->
-        <h4>Reactome Visualization</h4>
-        <div class="subtitle">with Connectome Logo</div>
+        <h4>Visualization Controls</h4>
 
         <!-- Stage Transition Buttons -->
         <div class="control-section">
@@ -74,24 +69,11 @@
             <div class="stage-buttons">
                 <button id="stage-1-btn" class="stage-btn active">Initial</button>
                 <button id="stage-2-btn" class="stage-btn">Reveal</button>
-                <!-- <button id="stage-3-btn" class="stage-btn">Focus</button> -->
             </div>
             <!-- <div class="stage-buttons">
-                <button id="stage-4-btn" class="stage-btn">Test</button>
-                <button id="stage-5-btn" class="stage-btn">Void</button>
-            </div> -->
-            <!-- <div class="stage-buttons">
-                <button id="stage-6-btn" class="stage-btn">SRE</button>
-                <button id="stage-7-btn" class="stage-btn">SEC</button>
-            </div>
-            <div class="stage-buttons">
-                <button id="stage-8-btn" class="stage-btn">DEV</button>
-                <button id="stage-9-btn" class="stage-btn">OPS</button>
-            </div> -->
-            <div class="stage-buttons">
                 <button id="auto-cycle-btn">Auto Cycle</button>
                 <button id="reset-stage-btn">Clear History</button>
-            </div>
+            </div> -->
         </div>
         
         <!-- Scene Section (ALWAYS KEEP THIS) -->
@@ -650,6 +632,23 @@
         </svg>
     </button>
 
+    <!-- Pause/Play Button with Gravity-Spin Icon -->
+    <div id="pause-btn" aria-label="Pause/Play animation" title="Toggle reactor rotation" class="pause-button">
+        <div class="pause-icon-wrapper">
+            <!-- Gravity-inspired spinning orbital icon -->
+            <svg class="gravity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <!-- Center core -->
+                <circle cx="12" cy="12" r="2.5" fill="#1cb495"/>
+                <!-- Orbital ring -->
+                <circle cx="12" cy="12" r="8" stroke="#1cb495" stroke-width="0.8" fill="none" opacity="0.4"/>
+                <!-- Orbiting particle -->
+                <circle cx="20" cy="12" r="1.5" fill="#1cb495" opacity="0.7"/>
+                <!-- Secondary orbital particle -->
+                <circle cx="8" cy="8" r="1" fill="#1cb495" opacity="0.5"/>
+            </svg>
+        </div>
+    </div>
+
     <!-- C Signet Standalone Viewer (320x320px) -->
     <div id="csignet-viewer" class="csignet-viewport">
         <!-- WebGL canvas will be rendered here -->
@@ -677,71 +676,48 @@
     <!-- SRE Article -->
     <article id="sre-article" class="content-article sre-article" style="display: none;">
         <div class="article-wrapper">
-            <header class="article-header">
-                <p class="article-subtitle">Autonomous Reliability Engineering</p>
-            </header>
-            <div class="article-content hack">
-                <p>The emergence of Agentic Site Reliability Engineering (SRE) represents the next stage of this evolutionary trajectory—a shift&nbsp;from static, rule-based responses&nbsp;to a dynamic, multi-agent cognitive architecture capable of autonomous perception, reasoning,&nbsp;and remediation.</p>
-                <blockquote>
-                    <p>Agentic SRE transcends traditional alerting&nbsp;and response mechanisms. It introduces autonomous agents&nbsp;that not only detect failures&nbsp;but predict, prevent,&nbsp;and self-heal infrastructure anomalies before they impact users.</p>
-                </blockquote>
-                <p>These systems learn&nbsp;from historical patterns, adapt&nbsp;to environmental changes,&nbsp;and coordinate across distributed teams&nbsp;and technologies&nbsp;with minimal human intervention.</p>
-            </div>
-            <button class="close-article-btn">×</button>
+            <!-- SRE CTA Cards Section -->
+            <div class="card-grid" id="sre-cards"></div>
         </div>
     </article>
 
     <!-- SEC Article -->
     <article id="sec-article" class="content-article sec-article" style="display: none;">
         <div class="article-wrapper">
-            <header class="article-header">
-                <p class="article-subtitle">Intelligent Threat Response</p>
-            </header>
-            <div class="article-content hack">
-                <p>Security orchestration represents the convergence of threat detection, prevention,&nbsp;and response&nbsp;into unified agent-driven workflows.</p>
-                <p>Traditional security operations centers struggle&nbsp;to keep pace&nbsp;with the velocity&nbsp;and sophistication of modern threats. Alert fatigue, manual triage,&nbsp;and siloed tooling create dangerous gaps&nbsp;where adversaries exploit the lags between detection&nbsp;and response.</p>
-                <blockquote>
-                    <p>Intelligent security systems operate&nbsp;at the speed of machines&nbsp;while maintaining human oversight&nbsp;and strategic decision-making authority.</p>
-                </blockquote>
-                <p>Agentic security architectures transform this paradigm by deploying autonomous agents&nbsp;that correlate signals across network, endpoint, identity,&nbsp;and cloud layers&nbsp;in real-time. These agents don't just alert—they investigate, contain,&nbsp;and remediate threats before lateral movement occurs.</p>
-            </div>
-            <button class="close-article-btn">×</button>
+            <!-- SEC CTA Cards Section -->
+            <div class="card-grid" id="sec-cards"></div>
         </div>
     </article>
 
     <!-- DEV Article (Sample) -->
     <article id="dev-article" class="content-article dev-article" style="display: none;">
         <div class="article-wrapper">
-            <header class="article-header">
-                <p class="article-subtitle">Intelligent Development Orchestration</p>
-            </header>
-            <div class="article-content hack">
-                <p>Development workflows represent the convergence of code generation, testing,&nbsp;and deployment&nbsp;into unified agent-driven CI/CD pipelines.</p>
-                <p>Modern development practices have evolved&nbsp;to embrace autonomous systems&nbsp;that not only compile&nbsp;and test code&nbsp;but understand architectural patterns, suggest optimizations,&nbsp;and prevent regressions before they reach production.</p>
-                <blockquote>
-                    <p>Intelligent development systems accelerate innovation&nbsp;while maintaining quality standards, enabling teams&nbsp;to focus&nbsp;on higher-level design&nbsp;and strategy.</p>
-                </blockquote>
-                <p>By leveraging agent-driven workflows, development cycles become faster, more reliable,&nbsp;and infinitely more scalable across distributed teams&nbsp;and global infrastructure.</p>
-            </div>
-            <button class="close-article-btn">×</button>
+            <!-- DEV CTA Cards Section -->
+            <div class="card-grid" id="dev-cards"></div>
         </div>
     </article>
 
     <!-- OPS Article -->
     <article id="ops-article" class="content-article ops-article" style="display: none;">
         <div class="article-wrapper">
+            <!-- OPS CTA Cards Section -->
+            <div class="card-grid" id="ops-cards"></div>
+        </div>
+    </article>
+
+    <!-- About Us Article (Hidden, revealed on footer click) -->
+    <article id="about-article" class="content-article about-article" style="display: none;">
+        <div class="article-wrapper">
             <header class="article-header">
-                <p class="article-subtitle">Cognitive Infrastructure Management</p>
+                <h1>WWWWWTF?</h1>
             </header>
             <div class="article-content hack">
-                <p>Autonomous operations transform infrastructure management&nbsp;from reactive firefighting&nbsp;to proactive system optimization.</p>
-                <p>Modern infrastructure spans hybrid clouds, edge deployments,&nbsp;and ephemeral containers&nbsp;that scale dynamically&nbsp;with demand. Human operators cannot manually manage this complexity—the cognitive load exceeds human bandwidth by orders of magnitude.</p>
-                <blockquote>
-                    <p>When operations become truly autonomous, systems don't just respond&nbsp;to failures—they anticipate, evolve,&nbsp;and optimize themselves continuously.</p>
-                </blockquote>
-                <p>Cognitive operations leverage multi-agent systems&nbsp;that observe telemetry streams, model system behavior,&nbsp;and execute remediation playbooks autonomously. These agents coordinate capacity planning, cost optimization,&nbsp;and performance tuning&nbsp;while humans focus&nbsp;on architecture&nbsp;and strategy.</p>
+                <p>Who — Collaborative think-tank for like minded individuals and open source enthusiasts proving open source is the cloud native fundation for future generations.</p>
+                <p>What — Research, design, planning and implementations using cloud native workflows.</p>
+                <p>When — Since 1990s with MSPs and now with Telco Cloud giants, we work with Google, Apple, Amazon, Nvidia, Oracle and Microsoft but we'd love to work with You too.</p>
+                <p>Where — Located all over the world, citizens of the cosmos we share the passion for all things tech.</p>
+                <p>Why — "Don't be a dick, Dick" - SRE, SEC, DEV, OPS - mitigate all the risk by automating the f❤︎ck out of it.</p>
             </div>
-            <button class="close-article-btn">×</button>
         </div>
     </article>
 
