@@ -1676,7 +1676,7 @@ function renderCards() {
             title: "SITE RELIABILITY ENGINEERING",
             svcStatus: "ACTIVELY RECRUITING PROJECTS",
             metrics: ["CLOUD MIGRATIONS", "SLOs, SLAs, SLIs", "LGTM Stack"],
-            email: "sre+anything@connectome.name",
+            email: "sre.anything@connectome.name",
         },
         {
             id: "secops",
@@ -1684,7 +1684,7 @@ function renderCards() {
             title: "SECURITY",
             svcStatus: "ACTIVELY RECRUITING PROJECTS",
             metrics: ["POLICIES & RBAC", "CLOUD COMPLIANCE", "CLOUD TRAILS"],
-            email: "secops+anything@connectome.name",
+            email: "secops.anything@connectome.name",
         },
         {
             id: "devops",
@@ -1692,7 +1692,7 @@ function renderCards() {
             title: "DEVOPS & PLATFORM DEVELOPMENT",
             svcStatus: "ACTIVELY RECRUITING PROJECTS",
             metrics: ["CLOUD AUTOMATION", "PLATFORM DEVELOPMENT", "IaaC & GITOPS"],
-            email: "devops+anything@connectome.name",
+            email: "devops.anything@connectome.name",
         },
         {
             id: "operations",
@@ -1700,7 +1700,7 @@ function renderCards() {
             title: "STRATEGY & OPERATIONS",
             svcStatus: "ACTIVELY RECRUITING PROJECTS",
             metrics: ["DESIGN & PLANNING", "CLOUD ORCHESTRATION", "CLOUD MAINTANANCE"],
-            email: "ops+anything@connectome.name",
+            email: "ops.anything@connectome.name",
         },
     ];
 
